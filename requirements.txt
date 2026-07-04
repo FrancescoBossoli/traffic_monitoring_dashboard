@@ -1,0 +1,11 @@
+# Computer Vision & Deep Learning
+ultralytics>=8.0.0
+opencv-python-headless>=4.8.0
+
+# Calcolo Scientifico (Tracking)
+numpy>=1.24.0
+scipy>=1.10.0
+
+# Web Framework & Streaming
+fastapi>=0.100.0
+uvicorn>=0.23.0

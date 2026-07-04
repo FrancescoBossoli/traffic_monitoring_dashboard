@@ -1,0 +1,68 @@
+=========================
+
+PYTHON & BACKEND
+
+=========================
+
+Cache e file compilati
+
+pycache/
+*.py[cod]
+*$py.class
+
+Ambienti virtuali
+
+venv/
+env/
+.venv/
+.env
+
+Modelli YOLO 
+
+backend/weights/*.pt
+
+Video e Dati Grezzi 
+
+backend/data/raw/.mp4
+backend/data/raw/.avi
+backend/data/raw/*.mkv
+*.mp4
+
+=========================
+
+NODE & FRONTEND
+
+=========================
+
+Dipendenze Node.js
+
+node_modules/
+frontend/node_modules/
+
+Cartelle di build e cache di Vite
+
+.vite/
+.vite-temp/
+frontend/.vite/
+frontend/.vite-temp/
+frontend/dist/
+frontend/build/
+dist/
+build/
+
+Log di errore
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+=========================
+
+SISTEMA OPERATIVO & IDE
+
+=========================
+
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

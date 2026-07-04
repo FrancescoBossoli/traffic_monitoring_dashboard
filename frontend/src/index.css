@@ -1,0 +1,75 @@
+@import url('https://fonts.googleapis.com/css2?family=Chivo:wght@300;400;700;900&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+    margin: 0;
+    background-color: #0D0D12;
+    font-family: 'IBM Plex Sans', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #0D0D12;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #262633;
+    border-radius: 8px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #34343f;
+}
+
+::selection {
+    background: #60A5FA;
+    color: #0D0D12;
+}
+
+.font-display { font-family: 'Chivo', sans-serif; }
+.font-mono-data { font-family: 'JetBrains Mono', monospace; }
+
+.grid-bg {
+    background-image:   linear-gradient(to right, #262633 1px, transparent 1px),
+                        linear-gradient(to bottom, #262633 1px, transparent 1px);
+    background-size: 40px 40px;
+}
+
+@keyframes pulse-live {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.4;
+    }
+}
+
+.live-dot {
+    animation: pulse-live 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #262633;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #34343f;
+}

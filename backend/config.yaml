@@ -1,0 +1,33 @@
+tracker_type: tracktrack # (str) ATTENZIONE: DEVE essere botsort o bytetrack, altrimenti YOLO va in crash!
+track_high_thresh: 0.4 # ABBASSATO: accetta rilevamenti più sfocati/veloci
+track_low_thresh: 0.1 # ABBASSATO
+new_track_thresh: 0.4 # ABBASSATO: inizia a tracciare l'auto anche se l'IA è incerta a causa del motion blur
+track_buffer: 60 
+match_thresh: 0.9 # ALZATO: permette di collegare lo stesso ID anche se l'auto ha fatto un "salto" in pixel enorme tra due frame
+lost_match_thr: 0.9 
+
+# Association weights
+iou_weight: 0.3 # ABBASSATO: la posizione (IoU) è meno affidabile ad alte velocità
+reid_weight: 0.7 # ALZATO: si affida maggiormente all'aspetto visivo (colore/forma) per mantenere l'ID
+conf_weight: 0.1 
+angle_weight: 0.05 
+
+# Iterative assignment
+penalty_p: 0.2 
+penalty_q: 0.4 
+reduce_step: 0.05 
+
+# Track-Aware Initialization (TAI)
+tai_thr: 0.55 
+min_track_len: 1 # ABBASSATO: conferma il tracciamento immediatamente al primo frame (invece di aspettarne 3)
+
+# Camera motion compensation
+gmc_method: sparseOptFlow 
+
+# ReID
+with_reid: True # ABILITATO: vitale per ricollegare i veicoli veloci che "saltano" i frame
+model: auto 
+
+proximity_thresh: 0.5
+appearance_thresh: 0.8
+fuse_score: True
