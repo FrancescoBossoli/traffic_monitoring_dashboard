@@ -17,6 +17,12 @@ env/
 .venv/
 .env
 
+Tests
+
+dataset_test/
+roboflow_dataset/
+runs/
+
 Modelli YOLO 
 
 backend/weights/*.pt
