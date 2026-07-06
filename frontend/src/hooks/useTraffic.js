@@ -5,6 +5,7 @@ import { ArrowUp, CornerUpLeft, CornerUpRight } from "lucide-react";
 const BE = `http://localhost:8000`;
 const API = `${BE}/api`;
 
+// Configurazioni grafiche e costanti di mappatura dell'incrocio
 const ACCENT = { N: "#60A5FA", S: "#F87171", E: "#FBBF24", W: "#34D399" };
 const CARDINAL_NAME = { N: "NORTH", S: "SOUTH", E: "EAST", W: "WEST" };
 const PANELS = {
@@ -15,55 +16,100 @@ const PANELS = {
 };
 const TURN_ICON = { left: CornerUpLeft, straight: ArrowUp, right: CornerUpRight };
 
+/**
+ * Hook custom per la gestione dello stato e del polling del traffico.
+ * @param {number} pollMs - Intervallo di aggiornamento in millisecondi.
+ */
 export default function useTraffic(pollMs = 800) {
     const [metrics, setMetrics] = useState(null);
     const [appraisals, setAppraisals] = useState([]);
     const [connected, setConnected] = useState(false);
     const timer = useRef(null);
 
-    const fetchAll = useCallback(async () => {
-        try {
-            const m = await axios.get(`${API}/metrics`);
-            const raw = m.data;
+    // Funzione interna per mappare ed normalizzare la risposta dell'API
+    const formatMetrics = useCallback((raw) => {
+        const appCount = raw.appraisals ? raw.appraisals.length : 0;
+        const trendVal = raw.total_crosses > 15 ? raw.total_crosses : 15;
 
-            setMetrics({
-                status: raw.status === "ANALYZING" ? "OK" : raw.status,
-                fps: raw.fps,
-                total: raw.appraisals ? raw.appraisals.length : 0,
-                active_vehicles: raw.appraisals ? raw.appraisals.length : 0, 
-                tracker: raw.tracker || "tracktrack",
-                active_camera: raw.active_camera || "day1",
-                counts: {
-                    N_W: raw.count_N_W, N_S: raw.count_N_S, N_E: raw.count_N_E,
-                    S_E: raw.count_S_E, S_N: raw.count_S_N, S_W: raw.count_S_W,
-                    W_S: raw.count_W_S, W_E: raw.count_W_E, W_N: raw.count_W_N,
-                    E_N: raw.count_E_N, E_W: raw.count_E_W, E_S: raw.count_E_S,
-                },
-                trend: [0, 5, 10, raw.total_crosses > 15 ? raw.total_crosses : 15] 
-            });
-            
-            setAppraisals(raw.appraisals || []);
-            setConnected(true);
-
-        } catch (e) {
-            console.error("Errore di connessione API:", e);
-            setConnected(false);
-        }
+        return {
+            status: raw.status === "ANALYZING" ? "OK" : raw.status,
+            fps: raw.fps,
+            total: appCount,
+            active_vehicles: appCount,
+            tracker: raw.tracker || "tracktrack",
+            active_camera: raw.active_camera || "day1",
+            counts: {
+                N_W: raw.count_N_W,
+                N_S: raw.count_N_S,
+                N_E: raw.count_N_E,
+                S_E: raw.count_S_E,
+                S_N: raw.count_S_N,
+                S_W: raw.count_S_W,
+                W_S: raw.count_W_S,
+                W_E: raw.count_W_E,
+                W_N: raw.count_W_N,
+                E_N: raw.count_E_N,
+                E_W: raw.count_E_W,
+                E_S: raw.count_E_S,
+            },
+            trend: [0, 5, 10, trendVal],
+        };
     }, []);
 
+    // Richiesta HTTP principale per recuperare i dati correnti
+    const fetchAll = useCallback(async () => {
+        try {
+            const response = await axios.get(`${API}/metrics`);
+            const raw = response.data;
+
+            setMetrics(formatMetrics(raw));
+            setAppraisals(raw.appraisals || []);
+            setConnected(true);
+        } catch (error) {
+            console.error("Errore di connessione API:", error);
+            setConnected(false);
+        }
+    }, [formatMetrics]);
+
+    // Ciclo di polling per aggiornare i dati in tempo reale
     useEffect(() => {
         fetchAll();
         timer.current = setInterval(fetchAll, pollMs);
         return () => clearInterval(timer.current);
     }, [fetchAll, pollMs]);
 
-    const setTracker = useCallback(async (mode) => {
-        try { await axios.post(`${API}/tracker/${mode}`); fetchAll(); } catch (e) {}
-    }, [fetchAll]);
+    // Endpoint per mutare lo stato del tracker a runtime
+    const setTracker = useCallback(
+        async (mode) => {
+            try {
+                await axios.post(`${API}/tracker/${mode}`);
+                fetchAll();
+            } catch (error) {
+                console.error("Errore switch tracker:", error);
+            }
+        },
+        [fetchAll]
+    );
 
-    const setCamera = useCallback(async (camId) => {
-        try { await axios.post(`${API}/camera/${camId}`); fetchAll(); } catch (e) {}
-    }, [fetchAll]);
+    // Endpoint per cambiare la sorgente video/condizione meteo
+    const setCamera = useCallback(
+        async (camId) => {
+            try {
+                await axios.post(`${API}/camera/${camId}`);
+                fetchAll();
+            } catch (error) {
+                console.error("Errore switch camera:", error);
+            }
+        },
+        [fetchAll]
+    );
 
-    return { metrics, appraisals, connected, setTracker, setCamera, videoSrc: `${BE}/video_feed` };
+    return {
+        metrics,
+        appraisals,
+        connected,
+        setTracker,
+        setCamera,
+        videoSrc: `${BE}/video_feed`,
+    };
 }

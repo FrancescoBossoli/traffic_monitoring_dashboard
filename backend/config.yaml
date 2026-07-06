@@ -1,33 +1,41 @@
-tracker_type: tracktrack # (str) ATTENZIONE: DEVE essere botsort o bytetrack, altrimenti YOLO va in crash!
-track_high_thresh: 0.4 # ABBASSATO: accetta rilevamenti più sfocati/veloci
-track_low_thresh: 0.1 # ABBASSATO
-new_track_thresh: 0.4 # ABBASSATO: inizia a tracciare l'auto anche se l'IA è incerta a causa del motion blur
-track_buffer: 60 
-match_thresh: 0.9 # ALZATO: permette di collegare lo stesso ID anche se l'auto ha fatto un "salto" in pixel enorme tra due frame
-lost_match_thr: 0.9 
+# =====================================================================
+# CONFIGURAZIONE TRACKER (YOLO / RE-ID INTERNO)
+# =====================================================================
 
-# Association weights
-iou_weight: 0.3 # ABBASSATO: la posizione (IoU) è meno affidabile ad alte velocità
-reid_weight: 0.7 # ALZATO: si affida maggiormente all'aspetto visivo (colore/forma) per mantenere l'ID
-conf_weight: 0.1 
-angle_weight: 0.05 
+# Tipo di tracker utilizzato
+tracker_type: tracktrack  # botsort | bytetrack | ocsort | deepocsort | fasttrack | tracktrack
 
-# Iterative assignment
-penalty_p: 0.2 
-penalty_q: 0.4 
-reduce_step: 0.05 
+# Soglie di rilevamento e tracciamento (Ottimizzate per alte velocità)
+track_high_thresh: 0.4    # Accetta rilevamenti più sfocati o veloci
+track_low_thresh: 0.1     # Soglia minima per non perdere la traccia
+new_track_thresh: 0.4     # Inizia il tracking anche con motion blur
+track_buffer: 60          # Frame di memoria per mantenere le tracce perse
+match_thresh: 0.9         # Tolleranza per grandi "salti" di pixel tra frame
+lost_match_thr: 0.9       # Soglia di recupero per tracce perse
+
+# Pesi di Associazione (Bilanciamento metriche)
+iou_weight: 0.3           # Abbassato: la sovrapposizione è meno affidabile
+reid_weight: 0.7          # Alzato: focus su aspetto visivo (colore/forma)
+conf_weight: 0.1          # Peso della confidenza del detector
+angle_weight: 0.05        # Peso dell'angolo di movimento del veicolo 
+
+# Parametri di Assegnazione Iterativa
+penalty_p: 0.2            # Penalità per rilevamenti a bassa affidabilità
+penalty_q: 0.4            # Penalità per i rilevamenti recuperati da NMS secondario
+reduce_step: 0.05         # Rilassamento della soglia di corrispondenza per iterazione
 
 # Track-Aware Initialization (TAI)
-tai_thr: 0.55 
-min_track_len: 1 # ABBASSATO: conferma il tracciamento immediatamente al primo frame (invece di aspettarne 3)
+tai_thr: 0.55             # Soglia IoU per l'inizializzazione NMS basata sulla traccia
+min_track_len: 1          # Conferma la traccia fin dal primo frame utile
 
-# Camera motion compensation
-gmc_method: sparseOptFlow 
+# Compensazione del movimento della telecamera (GMC)
+gmc_method: sparseOptFlow # sparseOptFlow | orb | sift | ecc | none
 
-# ReID
-with_reid: True # ABILITATO: vitale per ricollegare i veicoli veloci che "saltano" i frame
-model: auto 
+# Modello di Re-Identificazione (ReID)
+with_reid: True           # Vitale per ricollegare veicoli dopo occlusioni
+model: auto               # Seleziona automaticamente il modello ReID nativo
 
-proximity_thresh: 0.5
-appearance_thresh: 0.8
-fuse_score: True
+# Soglie di fusione e prossimità
+proximity_thresh: 0.5     # Minimo IoU richiesto per una corrispondenza ReID valida.
+appearance_thresh: 0.8    # Somiglianza minima nell'aspetto richiesta per ReID
+fuse_score: True          # Se combinare i punteggi di confidenza con le distanze IoU prima del matching.

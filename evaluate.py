@@ -10,7 +10,7 @@ def fix_dataset_for_coco(dataset_dir):
     yaml_path = os.path.join(dataset_dir, "data.yaml")
     labels_dir = os.path.join(dataset_dir, "valid", "labels")
 
-    # 1. Riscrive il data.yaml inserendo tutte le 80 classi COCO
+    # Riscrittura del data.yaml inserendo tutte le 80 classi COCO
     # per compatibilità con i pesi
     coco_yaml = f"""
         path: {os.path.abspath(dataset_dir)}
@@ -38,8 +38,8 @@ def fix_dataset_for_coco(dataset_dir):
     with open(yaml_path, "w") as f:
         f.write(coco_yaml.strip())
 
-    # 2. Corregge le annotazioni txt: mappa '0' (vehicle di Roboflow) a '2'
-    # (car di COCO)
+    # Correzione delle annotazioni txt:
+    # Conversione di '0' (vehicle di Roboflow) in '2' (car di COCO)
     if os.path.exists(labels_dir):
         txt_files = glob.glob(os.path.join(labels_dir, "*.txt"))
         for file_path in txt_files:
@@ -58,14 +58,16 @@ if __name__ == '__main__':
     dataset_dir = os.path.abspath("roboflow_dataset")
     dataset_yaml_path = os.path.join(dataset_dir, "data.yaml")
 
-    print("Allineo le etichette Roboflow al modello YOLO pre-addestrato...")
+    print(
+        "Allineamento delle etichette Roboflow al modello YOLO pre-addestrato"
+    )
     fix_dataset_for_coco(dataset_dir)
 
     model = YOLO("backend/weights/yolov8s.pt")
 
     print(f"\nInizio valutazione sul dataset: {dataset_yaml_path}")
 
-    # Avvia la validazione limitandola alla classe 2 (Auto/Car)
+    # Avvia della validazione limitandola alla classe 2 (Auto/Car)
     # workers=0 evita crash su Windows dovuti al multiprocessing
     metrics = model.val(
         data=dataset_yaml_path, split='val', workers=0, classes=[2]
